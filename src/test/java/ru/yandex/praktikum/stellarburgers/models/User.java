@@ -1,9 +1,13 @@
 package ru.yandex.praktikum.stellarburgers.models;
 
+import java.util.Random;
+
 public class User {
     public String email;
     public String password;
     public String name;
+
+    private static final Random random = new Random();
 
     public User() {}
 
@@ -14,7 +18,11 @@ public class User {
     }
 
     public static User random() {
-        String suffix = String.valueOf(System.currentTimeMillis());
-        return new User("user" + suffix + "@example.com", "Passw0rd!", "User" + suffix);
+        String suffix = String.valueOf(System.currentTimeMillis() + random.nextInt(1000));
+        return new User(
+            "user" + suffix + "@example.com",
+            "password" + suffix,
+            "User" + suffix
+        );
     }
 }

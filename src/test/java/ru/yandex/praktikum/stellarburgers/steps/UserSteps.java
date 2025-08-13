@@ -1,6 +1,7 @@
 package ru.yandex.praktikum.stellarburgers.steps;
 
 import io.restassured.response.ValidatableResponse;
+import ru.yandex.praktikum.stellarburgers.constants.Endpoints;
 import ru.yandex.praktikum.stellarburgers.models.LoginRequest;
 import ru.yandex.praktikum.stellarburgers.models.User;
 
@@ -12,7 +13,7 @@ public class UserSteps {
         return given()
                 .body(body)
                 .when()
-                .post("/api/auth/register")
+                .post(Endpoints.REGISTER)
                 .then();
     }
 
@@ -20,7 +21,7 @@ public class UserSteps {
         return given()
                 .body(body)
                 .when()
-                .post("/api/auth/login")
+                .post(Endpoints.LOGIN)
                 .then();
     }
 
@@ -28,7 +29,7 @@ public class UserSteps {
         return given()
                 .header("Authorization", accessToken)
                 .when()
-                .delete("/api/auth/user")
+                .delete(Endpoints.USER)
                 .then();
     }
 }
