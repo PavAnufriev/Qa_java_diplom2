@@ -28,6 +28,7 @@ public class UserRegistrationTests extends TestBase {
 
     @After
     public void tearDown() {
+        // Получение токена в методе after для выполнения cleanup даже при падении теста
         try {
             if (accessToken == null && cleanupUser != null) {
                 accessToken = userSteps.login(new LoginRequest(cleanupUser.email, cleanupUser.password))

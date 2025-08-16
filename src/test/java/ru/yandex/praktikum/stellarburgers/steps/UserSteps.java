@@ -1,5 +1,6 @@
 package ru.yandex.praktikum.stellarburgers.steps;
 
+import io.qameta.allure.Step;
 import io.restassured.response.ValidatableResponse;
 import ru.yandex.praktikum.stellarburgers.constants.Endpoints;
 import ru.yandex.praktikum.stellarburgers.models.LoginRequest;
@@ -9,6 +10,7 @@ import static io.restassured.RestAssured.given;
 
 public class UserSteps {
 
+    @Step("Регистрация пользователя")
     public ValidatableResponse register(User body) {
         return given()
                 .body(body)
@@ -17,6 +19,7 @@ public class UserSteps {
                 .then();
     }
 
+    @Step("Вход пользователя в систему")
     public ValidatableResponse login(LoginRequest body) {
         return given()
                 .body(body)
@@ -25,6 +28,7 @@ public class UserSteps {
                 .then();
     }
 
+    @Step("Удаление пользователя")
     public ValidatableResponse delete(String accessToken) {
         return given()
                 .header("Authorization", accessToken)

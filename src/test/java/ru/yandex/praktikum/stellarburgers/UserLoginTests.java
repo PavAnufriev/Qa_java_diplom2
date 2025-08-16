@@ -19,16 +19,30 @@ public class UserLoginTests extends TestBase {
 
     private UserSteps userSteps;
     private String accessToken;
+    private User testUser;
 
     @Before
     public void setUpTest() {
         userSteps = new UserSteps();
+        // Создаем пользователя заранее для тестов логина
+        testUser = User.random();
+        userSteps.register(testUser).statusCode(SC_OK);
     }
 
     @After
     public void tearDown() {
-        if (accessToken != null) {
-            userSteps.delete(accessToken);
+        // Получение токена в методе after для выполнения cleanup даже при падении теста
+        try {
+            if (accessToken == null && testUser != null) {
+                accessToken = userSteps.login(new LoginRequest(testUser.email, testUser.password))
+                        .statusCode(SC_OK)
+                        .extract().path("accessToken");
+            }
+            if (accessToken != null) {
+                userSteps.delete(accessToken);
+            }
+        } catch (Throwable ignored) {
+            // Best-effort cleanup
         }
     }
 
@@ -36,12 +50,10 @@ public class UserLoginTests extends TestBase {
     @Story("Login existing user")
     @Description("Вход под существующим пользователем")
     public void loginExistingUserSuccess() {
-        User user = User.random();
-        userSteps.register(user).statusCode(SC_OK);
-        ValidatableResponse resp = userSteps.login(new LoginRequest(user.email, user.password));
+        ValidatableResponse resp = userSteps.login(new LoginRequest(testUser.email, testUser.password));
         resp.statusCode(SC_OK)
                 .body("success", is(true))
-                .body("user.email", equalTo(user.email))
+                .body("user.email", equalTo(testUser.email))
                 .body("accessToken", notNullValue());
 
         accessToken = resp.extract().path("accessToken");
@@ -61,15 +73,13 @@ public class UserLoginTests extends TestBase {
     @Story("Login with wrong password")
     @Description("Вход с неверным паролем")
     public void loginWithWrongPasswordUnauthorized() {
-        User user = User.random();
-        userSteps.register(user).statusCode(SC_OK);
-
-        userSteps.login(new LoginRequest(user.email, "wrongpassword"))
+        userSteps.login(new LoginRequest(testUser.email, "wrongpassword"))
                 .statusCode(SC_UNAUTHORIZED)
                 .body("success", is(false))
                 .body("message", equalTo("email or password are incorrect"));
 
-        accessToken = userSteps.login(new LoginRequest(user.email, user.password))
+        // Получаем правильный токен для cleanup
+        accessToken = userSteps.login(new LoginRequest(testUser.email, testUser.password))
                 .statusCode(SC_OK)
                 .extract().path("accessToken");
     }

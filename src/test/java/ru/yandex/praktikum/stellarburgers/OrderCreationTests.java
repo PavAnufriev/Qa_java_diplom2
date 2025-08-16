@@ -18,8 +18,8 @@ import java.util.List;
 import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.*;
 
-@Feature("Orders API")
-public class OrderTests extends TestBase {
+@Feature("Order Creation API")
+public class OrderCreationTests extends TestBase {
 
     private UserSteps userSteps;
     private OrderSteps orderSteps;
@@ -89,38 +89,6 @@ public class OrderTests extends TestBase {
     @Description("Создание заказа с неверным хешем ингредиентов")
     public void createOrderWrongIngredientHashBadRequest() {
         orderSteps.createOrderWithoutAuth(new OrderRequest(List.of("invalid_hash")))
-                .statusCode(SC_BAD_REQUEST); // API returns 400 for invalid ingredient hash
-    }
-
-    @Test
-    @Story("Get all orders")
-    @Description("Получение списка всех заказов")
-    public void getAllOrdersSuccess() {
-        orderSteps.getAllOrders()
-                .statusCode(SC_OK)
-                .body("success", is(true))
-                .body("orders", notNullValue())
-                .body("total", notNullValue())
-                .body("totalToday", notNullValue());
-    }
-
-    @Test
-    @Story("Get user orders with auth")
-    @Description("Получение заказов конкретного пользователя")
-    public void getUserOrdersWithAuthSuccess() {
-        orderSteps.getUserOrders(accessToken)
-                .statusCode(SC_OK)
-                .body("success", is(true))
-                .body("orders", notNullValue());
-    }
-
-    @Test
-    @Story("Get user orders without auth")
-    @Description("Получение заказов пользователя без авторизации")
-    public void getUserOrdersWithoutAuthUnauthorized() {
-        orderSteps.getUserOrders(null)
-                .statusCode(SC_UNAUTHORIZED)
-                .body("success", is(false))
-                .body("message", equalTo("You should be authorised"));
+                .statusCode(SC_INTERNAL_SERVER_ERROR); // Must be 500 as per reviewer comment
     }
 }
