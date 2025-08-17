@@ -30,13 +30,14 @@ public class UserRegistrationTests extends TestBase {
     public void tearDown() {
         // Получение токена в методе after для выполнения cleanup даже при падении теста
         try {
-            if (accessToken == null && cleanupUser != null) {
-                accessToken = userSteps.login(new LoginRequest(cleanupUser.email, cleanupUser.password))
+            if (cleanupUser != null) {
+                // Всегда получаем свежий токен для удаления, независимо от результата теста
+                String cleanupToken = userSteps.login(new LoginRequest(cleanupUser.email, cleanupUser.password))
                         .statusCode(SC_OK)
                         .extract().path("accessToken");
-            }
-            if (accessToken != null) {
-                userSteps.delete(accessToken);
+                if (cleanupToken != null) {
+                    userSteps.delete(cleanupToken);
+                }
             }
         } catch (Throwable ignored) {
             // Best-effort cleanup
@@ -55,8 +56,7 @@ public class UserRegistrationTests extends TestBase {
                 .body("user.email", equalTo(user.email))
                 .body("user.name", equalTo(user.name))
                 .body("accessToken", notNullValue());
-
-        accessToken = resp.extract().path("accessToken");
+        // Токен НЕ сохраняем здесь - получение для cleanup происходит в @After
     }
 
     @Test
@@ -65,14 +65,13 @@ public class UserRegistrationTests extends TestBase {
     public void registerExistingUserForbidden() {
         User user = User.random();
         cleanupUser = user;
-        String token = userSteps.register(user).statusCode(SC_OK).extract().path("accessToken");
+        userSteps.register(user).statusCode(SC_OK);
 
         userSteps.register(user)
                 .statusCode(SC_FORBIDDEN)
                 .body("success", is(false))
                 .body("message", equalTo("User already exists"));
-
-        accessToken = token;
+        // Токен для cleanup получаем в @After методе
     }
 
     @Test

@@ -50,7 +50,7 @@ Thumbs.db
 # VS Code
 .vscode/
 
-# Allure results
-allure-results/
-**/allure-results/
-**/allure-report/
+# Allure results (временно разрешено для демонстрации ревьюеру)
+# allure-results/
+# allure-report/
+**/target/**/allure-maven-plugin/
