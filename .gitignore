@@ -42,3 +42,15 @@ buildNumber.properties
 # OS
 .DS_Store
 Thumbs.db
+
+# IntelliJ IDEA
+/.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Allure results (временно разрешено для демонстрации ревьюеру)
+# allure-results/
+# allure-report/
+**/target/**/allure-maven-plugin/
